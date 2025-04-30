@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
@@ -8,7 +9,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/auth", authRoutes);
+app.use(cors({
+    origin: 'http://localhost:5173',  // تأكد من أن هذا هو الـ URL الخاص بالـ front-end
+    credentials: true,
+  }));
+  app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
 app.use((error, req, res, next) => {

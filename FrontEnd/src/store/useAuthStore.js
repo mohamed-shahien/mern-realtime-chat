@@ -16,20 +16,42 @@ export const useAuthStore = create((set) => ({
                 } catch (error) {
                         console.log(error);
                         set({ authUser: null });
-                        
-                }finally{
+                } finally {
                         set({ isCheckingAuth: false });
                 }
         },
-        signUP: async (data) => {
-                set({isSigninUp: true})
+
+        signUp: async (data) => {
+                set({ isSigninUp: true })
                 try {
-                        const res = await axiosInstance.post('/auth/signup',data);
-                        set({authUser: res.data})
-                        toast.success("logined in")
-                        res.data
-                } catch {
-                        toast.error("bade reqest")
+                        const res = await axiosInstance.post('/auth/signup', data);
+                        set({ authUser: res.data })
+                        toast.success("user created successfully")
+                } catch(error) {
+                        toast.error(error.response.data.message);
+                } finally {
+                        set({ isSigninUp: false })
+                }
+        },
+        logout : async () => {
+                try {
+                        await axiosInstance.get("/auth/logout");
+                        set({ authUser: null });
+                        toast.success("User logged out successfully");
+                } catch (error) {
+                        toast.error(error.response.data.message);
+                }
+        },
+        LogIn: async (data) => {
+                try {
+                        set({ isLoggingIng: true });
+                        const res = await axiosInstance.post("/auth/login", data);
+                        set({ authUser: res.data });
+                        toast.success("User logged in successfully");
+                } catch (error) {
+                        toast.error(error.response.data.message);
+                } finally {
+                        set({ isLoggingIng: false });
                 }
         }
 }));

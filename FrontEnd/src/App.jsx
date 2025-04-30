@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import NavBar from './components/NavBar'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './components/pages/HomePage'
 import SignUpPage from './components/pages/SignUpPage'
@@ -9,13 +8,14 @@ import ProfilePage from './components/pages/ProfilePage'
 import { useAuthStore } from './store/useAuthStore'
 import {Loader} from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
+import Navbar from './components/NavBar'
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth} = useAuthStore();
   useEffect(()=> {
     checkAuth()
   }, [checkAuth])
-  if(authUser && !isCheckingAuth) return (
+  if(authUser && isCheckingAuth) return (
     <div className="flex items-center justify-center h-screen w-screen">
       <Loader className='size-10 animate-spin'></Loader>
     </div>
@@ -23,7 +23,7 @@ const App = () => {
   )
   return (
     <div>
-      <NavBar/>
+      <Navbar/>
       <Routes>
         <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
