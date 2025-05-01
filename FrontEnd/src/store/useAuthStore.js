@@ -53,5 +53,19 @@ export const useAuthStore = create((set) => ({
                 } finally {
                         set({ isLoggingIng: false });
                 }
-        }
+        },
+        UploadingProfile: async (data) => {
+                set({ isUploadingProfile: true });
+                try {
+                        const res = await axiosInstance.put("/auth/update-profile", data);
+                        set({ authUser: res.data });
+                        toast.success("Profile picture uploaded successfully");
+                } catch (error) {
+                        toast.error(error.response.data.message);
+                } finally {
+                        set({ isUploadingProfile: false });
+                }
+        },
 }));
+
+// ابقى اعمل انو ممكن يغير البيانات كلها من الفرونت

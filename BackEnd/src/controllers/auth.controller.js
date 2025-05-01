@@ -54,8 +54,8 @@ export const logout = async (req, res, next) => {
 }
 export const apdateProfile = async (req, res, next) => {
         const { profilePic } = req.body;
+        const userId = req.user._id;
         try {
-                const userId = req.user._id;
                 if (!profilePic) return next(AppError.init(false, 400, FAIL, "Profile picture is required"));
                 const uploadResponse = await cloudinary.uploader.upload(profilePic)
                 const updateUser = await User.findOneAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
