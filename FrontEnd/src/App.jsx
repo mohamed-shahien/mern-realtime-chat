@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import HomePage from './components/pages/HomePage'
 import SignUpPage from './components/pages/SignUpPage'
 import LogInPage from './components/pages/LogInPage'
 import SettingsPage from './components/pages/SettingsPage'
@@ -9,6 +8,7 @@ import { useAuthStore } from './store/useAuthStore'
 import {Loader} from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
 import Navbar from './components/NavBar'
+import HomePage from './components/pages/HomePage'
 import { useThemeUser } from './store/useThemeUser'
 
 const App = () => {
