@@ -1,19 +1,26 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../utils/axios';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
-export const useAuthStore = create((set) => ({
+
+const BASE_URL = 'http://localhost:5001';
+
+export const useAuthStore = create((set, get) => ({
         authUser: null,
         isSigninUp: false,
         isLoggingIng: false,
         isUploadingProfile: false,
         isCheckingAuth: false,
         onLineUsers: [],
+        sockit: null,
 
         checkAuth: async () => {
                 try {
                         const res = await axiosInstance.get("/auth/check");
                         set({ authUser: res.data });
+                        get().connectSocket();
+
                 } catch (error) {
                         console.log(error);
                         set({ authUser: null });
@@ -28,6 +35,7 @@ export const useAuthStore = create((set) => ({
                         const res = await axiosInstance.post('/auth/signup', data);
                         set({ authUser: res.data })
                         toast.success("user created successfully")
+                        get().connectSocket();
                 } catch(error) {
                         toast.error(error.response.data.message);
                 } finally {
@@ -39,6 +47,8 @@ export const useAuthStore = create((set) => ({
                         await axiosInstance.get("/auth/logout");
                         set({ authUser: null });
                         toast.success("User logged out successfully");
+                        get().desconnectSocket();
+
                 } catch (error) {
                         toast.error(error.response.data.message);
                 }
@@ -49,6 +59,7 @@ export const useAuthStore = create((set) => ({
                         const res = await axiosInstance.post("/auth/login", data);
                         set({ authUser: res.data });
                         toast.success("User logged in successfully");
+                        get().connectSocket();
                 } catch (error) {
                         toast.error(error.response.data.message);
                 } finally {
@@ -67,6 +78,16 @@ export const useAuthStore = create((set) => ({
                         set({ isUploadingProfile: false });
                 }
         },
+        connectSocket: () => {
+                const {authUser } = get();
+                if(!authUser || get().sockit?.connected) return;
+
+                const socket  = io(BASE_URL);
+                socket.connect()
+        },
+        desconnectSocket: (socket) => {
+                set({ sockit: socket });
+        }
 }));
 
 // ابقى اعمل انو ممكن يغير البيانات كلها من الفرونت
