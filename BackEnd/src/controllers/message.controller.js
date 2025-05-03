@@ -3,6 +3,8 @@ import ApiResponse from "../lib/apiresponse.js";
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudnary.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
+import { ERROR } from "../lib/httpsStatus.js";
 
 export const getUsersForSideBar = async (req, res, next) => {
         const loggedInUserId = req.user._id;
@@ -39,6 +41,12 @@ export const sendMessage = async (req, res, next) => {
                 }
                 const newMessage = new Message({ senderId, receiverId, text, image: imageURL });
                 await newMessage.save();
+
+                const receverSockerId = getReceiverSocketId(receiverId);
+                if (receverSockerId) {
+                        io.to(receverSockerId).emit("message", newMessage);
+                }
+
                 res.status(200).json(new ApiResponse(true, 200, "Message sent successfully", newMessage));
         } catch (error) {
                 return next(appError.init(false, 500, ERROR, error.message))

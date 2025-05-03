@@ -36,13 +36,13 @@ export const useAuthStore = create((set, get) => ({
                         set({ authUser: res.data })
                         toast.success("user created successfully")
                         get().connectSocket();
-                } catch(error) {
+                } catch (error) {
                         toast.error(error.response.data.message);
                 } finally {
                         set({ isSigninUp: false })
                 }
         },
-        logout : async () => {
+        logout: async () => {
                 try {
                         await axiosInstance.get("/auth/logout");
                         set({ authUser: null });
@@ -79,14 +79,22 @@ export const useAuthStore = create((set, get) => ({
                 }
         },
         connectSocket: () => {
-                const {authUser } = get();
-                if(!authUser || get().sockit?.connected) return;
+                const { authUser } = get();
+                if (!authUser || get().sockit?.connected) return;
 
-                const socket  = io(BASE_URL);
+                const socket = io(BASE_URL, {
+                        query: {
+                                userId: authUser.data._id
+                        }
+                });
                 socket.connect()
-        },
-        desconnectSocket: (socket) => {
                 set({ sockit: socket });
+                socket.on("getOnLineUsers", (userIds) => {
+                        set({ onLineUsers: userIds });
+                })
+        },
+        desconnectSocket: () => {
+                if (get().sockit?.connected) get().sockit.disconnect();
         }
 }));
 
