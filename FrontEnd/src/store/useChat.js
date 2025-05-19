@@ -46,6 +46,8 @@ export const useChat = create((set, get) => ({
                 if(!selectedUser) return;
                 const socket = useAuthStore.getState().sockit;
                 socket.on("message", (message) => {
+                        const isMessageSentFormSelectedUser = message.senderId === selectedUser._id;
+                        if (!isMessageSentFormSelectedUser) return;
                         set({ messages: [...get().messages, message] });
                 });
                 

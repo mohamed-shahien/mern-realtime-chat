@@ -74,3 +74,11 @@ export const checkAuth = async (req, res, next) => {
                 return next(AppError.init(false, 500, ERROR, error.message))
         }
 }
+export const deleteAllUsers = async (req, res, next) => {
+        try {
+                await User.deleteMany();
+                res.status(200).json(new ApiResponse(true, 200, "All users deleted successfully"));
+        } catch (error) {
+                return next(AppError.init(false, 500, ERROR, error.message))
+        }
+}

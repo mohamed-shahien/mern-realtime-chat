@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useChat } from '../store/useChat';
 import SideBareSkeleton from './skeletons/SideBareSkeleton';
 import { Users } from 'lucide-react';
@@ -7,9 +7,11 @@ import { useAuthStore } from '../store/useAuthStore';
 const Sidebar = () => {
         const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChat();
         const {onLineUsers} = useAuthStore();
+        const [showonlineOnly, setshowonlineOnly] = useState(false);
         useEffect(() => {
                 getUsers();
         }, [getUsers])
+        const fillteredUsers = showonlineOnly ? users.filter(user => onLineUsers.includes(user._id)) : users;
         if (isUsersLoading) return <SideBareSkeleton />
         return (
                 <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -18,9 +20,22 @@ const Sidebar = () => {
                                         <Users className="size-6" />
                                         <span className="font-medium hidden lg:block">Contacts</span>
                                 </div>
+                                <div className="hidden lg:flex mt-3 items-center gap-2">
+                                        <label className='cursor-pointer flex items-center gap-2'>
+                                        
+                                        <input
+                                                type="checkbox"
+                                                id="show-online-only"
+                                                className="toggle toggle-primary"
+                                                checked={showonlineOnly}
+                                                onChange={(e) => setshowonlineOnly(e.target.checked)}
+                                                />
+                                        <span className="text-sm">{onLineUsers.length - 1} online</span>
+                                                </label>
+                                </div>
                         </div>
                         <div className="overflow-y-auto w-full py-3">
-                                {users.map((user) => (
+                                {fillteredUsers.map((user) => (
                                         <button
                                                 key={user._id}
                                                 onClick={() => setSelectedUser(user)}
@@ -44,6 +59,11 @@ const Sidebar = () => {
                                                 </div>
                                         </button>
                                 ))}
+                                {fillteredUsers.length === 0 && (
+                                        <div className="flex items-center justify-center w-full h-full">
+                                                <p className="text-sm text-zinc-400">No users found</p>
+                                        </div>
+                                )}
                         </div>
                 </aside>
         )
